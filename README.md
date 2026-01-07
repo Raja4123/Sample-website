@@ -49,8 +49,8 @@ Run the pipeline — it will deploy the website automatically.
 Once successful, you’ll see this message in Jenkins logs:
 
  ✅ Deployment Successful!
-Your website will be available at:
+Your website will be available at: 👉 http://<your-server-ip>
 
-👉 http://<your-server-ip>
+
 
 
