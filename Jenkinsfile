@@ -10,8 +10,8 @@ pipeline {
         stage('copy the code to nginx') {
             steps {
               sh  ''' 
-                    rm -rf /var/www/html/* 
-                    cp index.html style.css script.js /var/www/html/
+                    sudo rm -rf /var/www/html/* 
+                    sudo cp index.html style.css script.js /var/www/html/
                 '''
             }
         }
