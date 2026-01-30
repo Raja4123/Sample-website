@@ -16,8 +16,8 @@ pipeline {
                 sh '''
                 echo "Taking backup of current website..."
                 TIMESTAMP=$(date +%F-%H-%M-%S)
-                mkdir -p $BACKUP_DIR/$TIMESTAMP
-                cp -r $WEB_DIR/* $BACKUP_DIR/$TIMESTAMP/ || true
+                sudo mkdir -p $BACKUP_DIR/$TIMESTAMP
+                sudo cp -r $WEB_DIR/* $BACKUP_DIR/$TIMESTAMP/ || true
                 '''
             }
         }
@@ -45,8 +45,8 @@ pipeline {
 
             sh '''
             LAST_BACKUP=$(ls -td $BACKUP_DIR/* | head -1)
-            rm -rf $WEB_DIR/*
-            cp -r $LAST_BACKUP/* $WEB_DIR/
+            sudo rm -rf $WEB_DIR/*
+            sudo cp -r $LAST_BACKUP/* $WEB_DIR/
             sudo systemctl restart nginx
             '''
 
