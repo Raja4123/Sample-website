@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    environment{
+        WEB_DIR = "/var/www/html/"
+        BACKUP_DIR = "/var/backups/nginx"
+    }
 
     stages {
         stage('cloning the code') {
@@ -7,11 +11,22 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Raja4123/Sample-website.git'
             }
         }
-        stage('copy the code to nginx') {
+        stage('Backup Current Website') {
             steps {
+                sh '''
+                echo "Taking backup of current website..."
+                TIMESTAMP=$(date +%F-%H-%M-%S)
+                mkdir -p $BACKUP_DIR/$TIMESTAMP
+                cp -r $WEB_DIR/* $BACKUP_DIR/$TIMESTAMP/ || true
+                '''
+            }
+        }
+        stage('Deploy new code') {
+            steps {
+                echo "Deploying new website..."
               sh  ''' 
-                    sudo rm -rf /var/www/html/* 
-                    sudo cp index.html style.css script.js /var/www/html/
+                    sudo rm -rf $WEB_DIR/* 
+                    sudo cp index.html style.css script.js $WEB_DIR/
                 '''
             }
         }
@@ -26,7 +41,16 @@ pipeline {
             echo 'Deployment Successful!' 
         } 
         failure { 
-            echo 'Deployment Failed!' 
+            echo "Deployment failed! Rolling back..."
+
+            sh '''
+            LAST_BACKUP=$(ls -td $BACKUP_DIR/* | head -1)
+            rm -rf $WEB_DIR/*
+            cp -r $LAST_BACKUP/* $WEB_DIR/
+            sudo systemctl restart nginx
+            '''
+
+            echo "Rollback completed successfully!"
         } 
     }
 }
